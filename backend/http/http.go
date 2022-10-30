@@ -18,6 +18,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rclone/rclone/bvfs"
 	"github.com/rclone/rclone/fs"
 	"github.com/rclone/rclone/fs/config/configmap"
 	"github.com/rclone/rclone/fs/config/configstruct"
@@ -663,7 +664,11 @@ func (f *Fs) Hashes() hash.Set {
 
 // Mkdir makes the root directory of the Fs object
 func (f *Fs) Mkdir(ctx context.Context, dir string) error {
-	return errorReadOnly
+	if err := bvfs.NewClient().SignIn().MkDir(ctx, dir); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Remove a remote http file object
